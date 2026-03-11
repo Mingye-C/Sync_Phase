@@ -1,9 +1,11 @@
+#include "ad9959.h"
 #include "usmart.h"
 #include "usmart_str.h"
 ////////////////////////////用户配置区///////////////////////////////////////////////
 //这下面要包含所用到的函数所申明的头文件(用户自己添加) 
 #include "delay.h"	 	
 #include "sys.h"
+#include "AD9959.h"
 				 
 extern void led_set(u8 sta);
 extern void test_fun(void(*ledset)(u8),u8 sta);										  
@@ -16,7 +18,8 @@ struct _m_usmart_nametab usmart_nametab[]=
 	(void*)write_addr,"void write_addr(u32 addr,u32 val)",	 
 #endif		   
 	(void*)delay_ms,"void delay_ms(u16 nms)",
- 	(void*)delay_us,"void delay_us(u32 nus)",	 				
+ 	(void*)delay_us,"void delay_us(u32 nus)",
+	(void*)Write_Phase,"void Write_Phase(uint8_t Channel, uint16_t Phase)",
 };						  
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
