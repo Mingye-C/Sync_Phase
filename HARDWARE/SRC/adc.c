@@ -26,7 +26,7 @@ ADC_HandleTypeDef ADC1_Handler={0};//ADC句柄
 void MY_ADC_Init(void)
 { 
     ADC1_Handler.Instance=ADC1;
-    ADC1_Handler.Init.ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV2;   
+    ADC1_Handler.Init.ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV4;   
     ADC1_Handler.Init.Resolution=ADC_RESOLUTION_12B;             //12位模式
     ADC1_Handler.Init.DataAlign=ADC_DATAALIGN_RIGHT;             //右对齐
     ADC1_Handler.Init.ScanConvMode=DISABLE;                      //非扫描模式
@@ -35,8 +35,8 @@ void MY_ADC_Init(void)
     ADC1_Handler.Init.NbrOfConversion=1;                         //1个转换在规则序列中 也就是只转换规则序列1 
     ADC1_Handler.Init.DiscontinuousConvMode=DISABLE;             //禁止不连续采样模式
     ADC1_Handler.Init.NbrOfDiscConversion=0;                     //不连续采样通道数为0
-    ADC1_Handler.Init.ExternalTrigConv=ADC_EXTERNALTRIGCONV_T2_TRGO;       //TIM2
-    ADC1_Handler.Init.ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_RISING;//rising edge
+    ADC1_Handler.Init.ExternalTrigConv=ADC_SOFTWARE_START;       //SOFTWARE
+    ADC1_Handler.Init.ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE;//rising edge
     ADC1_Handler.Init.DMAContinuousRequests=DISABLE;             //DMA请求
 
     ADC_ChannelConfTypeDef chan = {0};
@@ -56,7 +56,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 {
     GPIO_InitTypeDef GPIO_Initure;
     __HAL_RCC_ADC1_CLK_ENABLE();            //使能ADC1时钟
-    __HAL_RCC_GPIOC_CLK_ENABLE();			//开启GPIOA时钟
+    __HAL_RCC_GPIOC_CLK_ENABLE();			//开启GPIOC时钟
 	
     GPIO_Initure.Pin=GPIO_PIN_3;            //PC3
     GPIO_Initure.Mode=GPIO_MODE_ANALOG;     //模拟
@@ -66,6 +66,17 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 
 u16 Get_ADC(void)
 {
-    HAL_ADC_PollForConversion(&ADC1_Handler, 0xffffffff);
-    return HAL_ADC_GetValue(&ADC1_Handler);
+    ADC_ChannelConfTypeDef ADC1_ChanConf;
+    
+    ADC1_ChanConf.Channel=ADC_CHANNEL_13;                                   //通道
+    ADC1_ChanConf.Rank=1;                                       //第1个序列，序列1
+    ADC1_ChanConf.SamplingTime=ADC_SAMPLETIME_480CYCLES;        //采样时间
+    ADC1_ChanConf.Offset=0;                 
+    HAL_ADC_ConfigChannel(&ADC1_Handler,&ADC1_ChanConf);        //通道配置
+	
+    HAL_ADC_Start(&ADC1_Handler);                               //开启ADC
+	
+    HAL_ADC_PollForConversion(&ADC1_Handler,10);                //轮询转换
+ 
+	return (u16)HAL_ADC_GetValue(&ADC1_Handler);	        //返回最近一次ADC1规则组的转换结果
 }
