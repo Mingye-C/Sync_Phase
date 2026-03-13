@@ -56,7 +56,6 @@ int main(void)
 	TIM2_Init(42-1, 4-1);		
 	MY_ADC_Init();
 
-	HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);	
 	// delay_ms(2000);
 	// HAL_Delay(2000);
 	// HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);	
@@ -112,28 +111,19 @@ int main(void)
 
 	while(1)
 	{
-		// // printf("ADC:%u\n",Get_ADC());
-		// uint16_t adc_data_loop = Get_ADC();
-		// // HAL_USART_Transmit(&UART1_Handler, "test", sizeof("test"), 200);
-		// HAL_UART_Transmit(&UART1_Handler, (uint8_t*)"test\n", 6, 200);
-		// uint8_t buffer[] = "0000\n";
-		// buffer[3]=adc_data_loop%10+'0';
-		// buffer[2]=(adc_data_loop/10)%10+'0';
-		// buffer[1]=(adc_data_loop/100)%10+'0';
-		// buffer[0]=(adc_data_loop/1000)%10+'0';
-		// HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);
-		// HAL_UART_Transmit(&UART1_Handler, buffer, 6, 200);
-		// // HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);
-		// // delay_ms(2000);
-		// HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);	
 		if (KEY_Scan(0)==KEY0) {
-			degree=(degree+10)/360;
+			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);	
+			degree=(degree+10)%360;
 			Write_Phase(0, degree);
 			AD9959_IO_Update();
+			delay_ms(200);
 		} else if (KEY_Scan(0)==KEY2) {
-			degree=(degree-10)/360;
+			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);	
+			degree=(degree-10)%360;
 			Write_Phase(0, degree);
 			AD9959_IO_Update();
+			delay_ms(200);
 		}
 
 	}
