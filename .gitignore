@@ -1,3 +1,5 @@
 /build/
 /.vscode/
 /.cache/
+/USER/CMakeLists.txt
+/USER/toolchain.cmake
