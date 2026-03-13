@@ -141,7 +141,7 @@ void Init_AD9959(void)
 {
     // GPIO need to be initialized before calling this function
 
-    uint8_t FR1_DATA[3] = {0xc3, 0x00, 0x00}; // 16 frequency doubling
+    uint8_t FR1_DATA[3] = {0x93, 0x00, 0x00}; // 4 frequency doubling
     uint8_t CFR_DATA[3] = {0x00, 0x03, 0x00}; // default Value = 0x000302
     _Init_AD9959_GPIO();
     InitIO_9959();
