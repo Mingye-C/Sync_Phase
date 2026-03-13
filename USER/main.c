@@ -62,48 +62,23 @@ int main(void)
 
 	// Write_Frequence(0, 5*MHz);
 	AD9959_IO_Update();
-	Synchronize_Frequence(0, 4, 1);
+	Synchronize_Frequence(0, 4, 4);
 	AD9959_IO_Update();
 	
-	Write_Amplitude(0, 300);
+	Write_Amplitude(0, 1000);
 	AD9959_IO_Update();
-	Write_Phase(0, 0);
-	AD9959_IO_Update();
-	uint16_t data0 = Get_ADC();
-	delay_ms(200);
 
-	Write_Phase(0, 90);
-	AD9959_IO_Update();
-	uint16_t data1 = Get_ADC();
-	delay_ms(200);
+	int max = 0, degree=0;
 
-	Write_Phase(0, 180);
-	AD9959_IO_Update();
-	uint16_t data2 = Get_ADC();
-	delay_ms(200);
-
-	Write_Phase(0, 270);
-	AD9959_IO_Update();
-	uint16_t data3 = Get_ADC();
-	delay_ms(200);
-
-	UART_Trans_Num(data0);
-	UART_Trans_Num(data1);
-	UART_Trans_Num(data2);
-	UART_Trans_Num(data3);
-
-	uint16_t degree = 0;
-	if (data0>1500) {
-		degree = 0;
-	}
-	if (data1>1500) {
-		degree = 90;
-	}
-	if (data2>1500) {
-		degree = 180;
-	}
-	if (data3>1500) {
-		degree = 270;
+	for (int i=0; i<360; i+=1) {
+		Write_Phase(0, i);
+		AD9959_IO_Update();
+		uint16_t data = Get_ADC();
+		if (data>max) {
+			max=data;
+			degree=i;
+		}
+		delay_ms(20);
 	}
 
 	Write_Phase(0, degree);
