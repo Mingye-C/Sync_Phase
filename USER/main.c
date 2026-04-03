@@ -91,16 +91,16 @@ int main(void)
 		HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);	
 		if (KEY_Scan(0)==KEY0) {
 			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);	
-			degree=(degree+10)%360;
-			Write_Phase(0, degree);
+			phase10=(phase10+50)%3600;
+			Write_Phase(0, (float)phase10/10.0);
 			AD9959_IO_Update();
-			delay_ms(200);
+			delay_ms(2000);
 		} else if (KEY_Scan(0)==KEY2) {
 			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);	
-			degree=(degree-10)%360;
-			Write_Phase(0, degree);
+			phase10=(phase10+5)%3600;
+			Write_Phase(0, (float)phase10/10.0);
 			AD9959_IO_Update();
-			delay_ms(200);
+			delay_ms(2000);
 		}
 	}
 }

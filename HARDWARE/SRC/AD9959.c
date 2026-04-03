@@ -357,7 +357,7 @@ void Write_Amplitude(uint8_t Channel, uint16_t Ampli)
 void Write_Phase(uint8_t Channel, float Phase)
 {
     // Phase_max = 16383
-    if (Phase > 359 || Phase < 0)
+    if (Phase >= 360 || Phase < 0)
     {
         Phase = 0;
         AD9959_error();
