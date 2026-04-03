@@ -3,6 +3,7 @@
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_rcc.h"
 #include "stm32f4xx_hal_rcc_ex.h"
+#include <stdint.h>
 
 #define SDIO0_GPIO_Port     GPIOC
 #define SDIO0_Pin           GPIO_PIN_7
@@ -363,6 +364,13 @@ void Write_Phase(uint8_t Channel, uint16_t Phase)
     }
     uint8_t CPOW0_DATA[2] = {0x00, 0x00};
     Phase2Word(Phase, CPOW0_DATA);
+    Channel_Select(Channel);
+    WriteData_AD9959(CPOW0_ADD, 2, CPOW0_DATA);
+}
+
+void Write_Phase_Word(uint8_t Channel, uint16_t Phase_Word)
+{
+    uint8_t CPOW0_DATA[2] = {Phase_Word>>8, Phase_Word&0xff};
     Channel_Select(Channel);
     WriteData_AD9959(CPOW0_ADD, 2, CPOW0_DATA);
 }

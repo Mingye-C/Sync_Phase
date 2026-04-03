@@ -54,6 +54,7 @@ void Write_Frequence(uint8_t Channel, uint32_t Freq);
 void Synchronize_Frequence(uint8_t Channel, uint8_t exponential, uint32_t multiplier);
 void Write_Amplitude(uint8_t Channel, uint16_t Ampli);
 void Write_Phase(uint8_t Channel, uint16_t Phase);
+void Write_Phase_Word(uint8_t Channel, uint16_t Phase_Word);
 
 uint32_t Get_Freq(void);
 uint8_t Get_Amp(void);
