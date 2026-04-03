@@ -53,8 +53,7 @@ void ReadData_AD9959(uint8_t RegisterAddress, uint8_t NumberofRegisters, uint8_t
 void Write_Frequence(uint8_t Channel, uint32_t Freq);
 void Synchronize_Frequence(uint8_t Channel, uint8_t exponential, uint32_t multiplier);
 void Write_Amplitude(uint8_t Channel, uint16_t Ampli);
-void Write_Phase(uint8_t Channel, uint16_t Phase);
-void Write_Phase_Word(uint8_t Channel, uint16_t Phase_Word);
+void Write_Phase(uint8_t Channel, float Phase);
 
 uint32_t Get_Freq(void);
 uint8_t Get_Amp(void);
@@ -66,5 +65,5 @@ void SET_2FSK(uint8_t Channel, double f_start, double f_stop);
 void SET_2ASK(uint8_t Channel, double f, uint16_t A_start, uint16_t A_stop);
 void Freq2Word(double f, uint8_t *fWord);
 void Amp2Word(uint16_t A, uint8_t *AWord);
-void Phase2Word(uint16_t Phase, uint8_t *PWord);
+void Phase2Word(float Phase, uint8_t *PWord);
 #endif

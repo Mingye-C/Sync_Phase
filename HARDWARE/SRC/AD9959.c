@@ -354,7 +354,7 @@ void Write_Amplitude(uint8_t Channel, uint16_t Ampli)
  * @param Channel The channel number.(0 to 3)
  * @param Phase The phase value(degree) to be written.(0 to 359)
  */
-void Write_Phase(uint8_t Channel, uint16_t Phase)
+void Write_Phase(uint8_t Channel, float Phase)
 {
     // Phase_max = 16383
     if (Phase > 359 || Phase < 0)
@@ -364,13 +364,6 @@ void Write_Phase(uint8_t Channel, uint16_t Phase)
     }
     uint8_t CPOW0_DATA[2] = {0x00, 0x00};
     Phase2Word(Phase, CPOW0_DATA);
-    Channel_Select(Channel);
-    WriteData_AD9959(CPOW0_ADD, 2, CPOW0_DATA);
-}
-
-void Write_Phase_Word(uint8_t Channel, uint16_t Phase_Word)
-{
-    uint8_t CPOW0_DATA[2] = {Phase_Word>>8, Phase_Word&0xff};
     Channel_Select(Channel);
     WriteData_AD9959(CPOW0_ADD, 2, CPOW0_DATA);
 }
@@ -673,7 +666,7 @@ void Amp2Word(uint16_t A, uint8_t *AWord)
     AWord[0] = 0x00;
 }
 
-void Phase2Word(uint16_t Phase, uint8_t *PWord)
+void Phase2Word(float Phase, uint8_t *PWord)
 {
     // PWord 2 bytes
     uint16_t Temp = (uint16_t)(45.511111111 * Phase); // 360/2^16 = 45.511111111

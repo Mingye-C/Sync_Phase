@@ -84,6 +84,8 @@ int main(void)
 	Write_Phase(0, degree);
 	AD9959_IO_Update();
 
+	uint16_t phase10 = degree*10;
+
 	while(1)
 	{
 		HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);	
@@ -100,7 +102,6 @@ int main(void)
 			AD9959_IO_Update();
 			delay_ms(200);
 		}
-
 	}
 }
 
