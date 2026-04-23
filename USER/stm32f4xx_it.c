@@ -38,8 +38,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_it.h"
-
-extern DMA_HandleTypeDef hdma_adc2_sim;
+#include "mod_signal.h"
 
 /** @addtogroup STM32F4xx_HAL_Examples
  * @{

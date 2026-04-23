@@ -8,6 +8,7 @@ project(TOUCH LANGUAGES C ASM)
 # 添加可执行文件
 add_executable(${PROJECT_NAME}
     ./main.c
+    ./mod_signal.c
     ./stm32f4xx_it.c
     ./system_stm32f4xx.c
     ./stm32f4xx_hal_msp.c
