@@ -10,6 +10,8 @@ extern DMA_HandleTypeDef hdma_dac1_ch2_sim; // 供 stm32f4xx_it.c 调用
 #define SIM_BUFFER_SIZE 1024
 #define DELAY_BUFFER_SIZE 10000
 
+extern uint32_t fixed_delay_samples;
+
 // 外部接口声明
 void SIM_TIM2_TRGO_Init(void);
 void SIM_ADC2_DMA_Init(void);

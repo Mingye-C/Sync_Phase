@@ -99,18 +99,39 @@ int main(void)
 		if (KEY_Scan(0) == KEY0)
 		{
 			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);
-			phase10 = (phase10 + 50) % 3600;
+			phase10 = (phase10 + 100) % 3600;
 			Write_Phase(0, (float)phase10 / 10.0);
 			AD9959_IO_Update();
-			delay_ms(2000);
+			delay_ms(500);
 		}
 		else if (KEY_Scan(0) == KEY2)
 		{
 			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);
-			phase10 = (phase10 + 5) % 3600;
+			phase10 = (phase10 - 100) % 3600;
 			Write_Phase(0, (float)phase10 / 10.0);
 			AD9959_IO_Update();
-			delay_ms(2000);
+			delay_ms(500);
+		}
+		// 在 main.c 的 while(1) 循环中添加
+		else if (KEY_Scan(0) == KEY1)
+		{
+			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET); // 灭灯反馈
+
+			// 每次按下增加 1 个采样点的延迟
+			// 100kHz 采样率下，1 点 = 10us
+			fixed_delay_samples++;
+
+			// 防止超过环形缓冲区大小
+			if (fixed_delay_samples >= DELAY_BUFFER_SIZE)
+			{
+				fixed_delay_samples = 0;
+			}
+
+			// 串口打印一下当前延迟点数，方便调试
+			// UART_Trans_Num(fixed_delay_samples);
+
+			delay_ms(500);										   // 适当缩短延时，让调节手感更灵敏
+			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET); // 亮灯
 		}
 	}
 }
