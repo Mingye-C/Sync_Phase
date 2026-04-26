@@ -19,12 +19,15 @@
 #include "dac.h"
 #include "timer.h"
 #include "mod_signal.h"
+#include <string.h>
 
 #define MHz 1000000
 #define kHz 1000
 
 uint16_t adc_data[1024 + 32] = {0};
 uint8_t dma_finish_flag = 0;
+
+void Auto_Phase_Lock(void);
 
 #define BACKGROUND WHITE
 /************************************************
@@ -112,7 +115,7 @@ int main(void)
 			AD9959_IO_Update();
 			delay_ms(500);
 		}
-		// 在 main.c 的 while(1) 循环中添加
+
 		else if (KEY_Scan(0) == KEY1)
 		{
 			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET); // 灭灯反馈

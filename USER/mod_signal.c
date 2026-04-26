@@ -14,8 +14,15 @@ uint16_t sim_adc_rx_buf[SIM_BUFFER_SIZE];
 uint16_t sim_dac_tx_buf[SIM_BUFFER_SIZE];
 uint16_t sim_delay_ring_buf[DELAY_BUFFER_SIZE] = {0};
 
+// 新增全局变量用于频率追踪
+float current_period_samples = 0; // 当前信号一个周期对应的采样点数
+uint32_t sample_counter = 0;      // 采样计数器
+uint16_t last_adc_val = 2048;     // 用于判断过零
+// 在函数外定义一个静态变量用于平滑
+static float smoothed_period = 0;
+
 uint32_t ring_write_idx = 0;
-uint32_t fixed_delay_samples = 0; // 固定延迟点数 (100kHz下，0点 = 0ms)
+uint32_t fixed_delay_samples = 29; // 固定延迟点数 (100kHz下，0点 = 0ms)
 
 // ========================================================
 // 2. 外设初始化函数
@@ -142,22 +149,59 @@ void SIM_Process_Block(uint16_t *pIn, uint16_t *pOut, uint16_t length)
 {
     for (int i = 0; i < length; i++)
     {
-        uint16_t current_sample = pIn[i];
-        sim_delay_ring_buf[ring_write_idx] = current_sample;
+        uint16_t current_val = pIn[i];
+        sample_counter++;
 
-        int read_idx = ring_write_idx - fixed_delay_samples;
-        if (read_idx < 0)
+        // --- 1. 过零检测逻辑 (假设中位电压是 2048) ---
+        // 检测上升沿过零点
+        if (last_adc_val <= 2048 && current_val > 2048)
         {
-            read_idx += DELAY_BUFFER_SIZE;
+            if (sample_counter > 5) // 简单防抖：频率不高于 20kHz
+            {
+                // --- 核心修改：增加一阶滤波，消除重影 ---
+                if (smoothed_period == 0)
+                    smoothed_period = sample_counter; // 初始化
+
+                // 0.9f 表示 90% 保留旧值，10% 采用新值。这个比例越高，波形越稳，但频率跟踪越慢
+                smoothed_period = (smoothed_period * 0.9f) + ((float)sample_counter * 0.1f);
+                current_period_samples = smoothed_period;
+
+                sample_counter = 0;
+            }
+        }
+        last_adc_val = current_val;
+
+        // --- 2. 存入环形缓冲区 ---
+        sim_delay_ring_buf[ring_write_idx] = current_val;
+
+        // --- 3. 线性插值跟随输出 ---
+        float system_debt = 3.5f; // 硬件延迟通常不是整数个周期，可以带小数微调
+        float precise_read_offset = current_period_samples - system_debt;
+
+        if (precise_read_offset > 0)
+        {
+            float read_pos = (float)ring_write_idx - precise_read_offset;
+            while (read_pos < 0)
+                read_pos += DELAY_BUFFER_SIZE;
+
+            // 取整数部分和小数部分
+            int idx_low = (int)read_pos;
+            int idx_high = (idx_low + 1) % DELAY_BUFFER_SIZE;
+            float frac = read_pos - (float)idx_low;
+
+            // 线性插值公式：y = y0 + frac * (y1 - y0)
+            pOut[i] = (uint16_t)(sim_delay_ring_buf[idx_low] +
+                                 frac * (sim_delay_ring_buf[idx_high] - sim_delay_ring_buf[idx_low]));
+        }
+        else
+        {
+            pOut[i] = current_val; // 频率极高或未检测到周期时，直接直通
         }
 
-        pOut[i] = sim_delay_ring_buf[read_idx];
-
+        // 更新索引
         ring_write_idx++;
         if (ring_write_idx >= DELAY_BUFFER_SIZE)
-        {
             ring_write_idx = 0;
-        }
     }
 }
 
