@@ -27,17 +27,19 @@
 uint16_t adc_data[1024 + 32] = {0};
 uint8_t dma_finish_flag = 0;
 
+uint8_t phase_shift_state = 0;
+
 void Auto_Phase_Lock(void);
 
 #define BACKGROUND WHITE
 /************************************************
- ALIENTEK 探索者STM32F407开发板 实验28
- 触摸屏实验-HAL库函数版
- 技术支持：www.openedv.com
- 淘宝店铺：http://eboard.taobao.com
- 关注微信公众平台微信号："正点原子"，免费获取STM32资料。
- 广州市星翼电子科技有限公司
- 作者：正点原子 @ALIENTEK
+	ALIENTEK 探索者STM32F407开发板 实验28
+	触摸屏实验-HAL库函数版
+	技术支持：www.openedv.com
+	淘宝店铺：http://eboard.taobao.com
+	关注微信公众平台微信号："正点原子"，免费获取STM32资料。
+	广州市星翼电子科技有限公司
+	作者：正点原子 @ALIENTEK
 ************************************************/
 
 void UART_Trans_Num(uint16_t num);
@@ -118,23 +120,20 @@ int main(void)
 
 		else if (KEY_Scan(0) == KEY1)
 		{
-			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET); // 灭灯反馈
+			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);
 
-			// 每次按下增加 1 个采样点的延迟
-			// 100kHz 采样率下，1 点 = 10us
-			fixed_delay_samples++;
-
-			// 防止超过环形缓冲区大小
-			if (fixed_delay_samples >= DELAY_BUFFER_SIZE)
+			// 状态机切换：0 -> 1 -> 2 -> 3 -> 0
+			phase_shift_state++;
+			if (phase_shift_state > 3)
 			{
-				fixed_delay_samples = 0;
+				phase_shift_state = 0;
 			}
 
-			// 串口打印一下当前延迟点数，方便调试
-			// UART_Trans_Num(fixed_delay_samples);
+			// 在 LCD 上显示当前状态或角度
+			LCD_ShowNum(160, 150, phase_shift_state * 90, 3, 16);
 
-			delay_ms(500);										   // 适当缩短延时，让调节手感更灵敏
-			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET); // 亮灯
+			delay_ms(200); // 简单消抖
+			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);
 		}
 	}
 }

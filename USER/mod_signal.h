@@ -12,6 +12,7 @@
 extern uint16_t sim_adc_rx_buf[SIM_BUFFER_SIZE];
 extern uint16_t sim_dac_tx_buf[SIM_BUFFER_SIZE];
 extern uint32_t fixed_delay_samples;
+extern uint8_t phase_shift_state;
 
 // 3. 导出 DMA 句柄
 extern DMA_HandleTypeDef hdma_adc2_sim;

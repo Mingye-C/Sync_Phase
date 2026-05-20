@@ -1,8 +1,5 @@
 #include "mod_signal.h"
 
-// ========================================================
-// 1. 私有全局变量（不对 main.c 暴露，保证封装性）
-// ========================================================
 TIM_HandleTypeDef htim2_sim;
 ADC_HandleTypeDef hadc2_sim;
 DAC_HandleTypeDef hdac1_sim;
@@ -176,7 +173,14 @@ void SIM_Process_Block(uint16_t *pIn, uint16_t *pOut, uint16_t length)
 
         // --- 3. 线性插值跟随输出 ---
         float system_debt = 3.5f; // 硬件延迟通常不是整数个周期，可以带小数微调
-        float precise_read_offset = current_period_samples - system_debt;
+        float base_offset = current_period_samples - system_debt;
+
+        float manual_offset = current_period_samples * ((float)phase_shift_state * 0.25f);
+        float precise_read_offset = base_offset + manual_offset;
+        while (precise_read_offset >= current_period_samples)
+        {
+            precise_read_offset -= current_period_samples;
+        }
 
         if (precise_read_offset > 0)
         {
